@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Traffic Light Management System</title>
+  <meta name="description" content="Real-time adaptive traffic signal control dashboard with YOLOv8 vehicle detection across 3 lanes." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ── HEADER ── -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo-icon">🚦</div>
+      <div>
+        <h1 class="header-title">Traffic Light Management</h1>
+        <p class="header-sub">Real-Time Adaptive Signal Controller · YOLOv8</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="status-pill" id="systemStatus">
+        <span class="status-dot"></span>
+        <span>System Running</span>
+      </div>
+      <div class="clock" id="clock">--:--:--</div>
+    </div>
+  </header>
+
+  <!-- ── CYCLE INFO BAR ── -->
+  <div class="cycle-bar">
+    <div class="cycle-stat">
+      <span class="cycle-label">Cycle Budget</span>
+      <span class="cycle-value mono">120 s</span>
+    </div>
+    <div class="cycle-divider"></div>
+    <div class="cycle-stat">
+      <span class="cycle-label">Min Green</span>
+      <span class="cycle-value mono">10 s</span>
+    </div>
+    <div class="cycle-divider"></div>
+    <div class="cycle-stat">
+      <span class="cycle-label">Max Green</span>
+      <span class="cycle-value mono">60 s</span>
+    </div>
+    <div class="cycle-divider"></div>
+    <div class="cycle-stat">
+      <span class="cycle-label">Yellow Phase</span>
+      <span class="cycle-value mono">3 s</span>
+    </div>
+    <div class="cycle-divider"></div>
+    <div class="cycle-stat">
+      <span class="cycle-label">Cycle #</span>
+      <span class="cycle-value mono" id="cycleNum">1</span>
+    </div>
+    <div class="cycle-divider"></div>
+    <div class="cycle-stat">
+      <span class="cycle-label">Device</span>
+      <span class="cycle-value mono" id="deviceLabel">CUDA</span>
+    </div>
+  </div>
+
+  <!-- ── LANE CARDS ── -->
+  <main class="lanes-grid">
+
+    <!-- Lane 0 -->
+    <div class="lane-card" id="lane-0">
+      <div class="lane-header">
+        <div class="lane-id">
+          <span class="lane-badge">L0</span>
+          <span class="lane-name">Lane 0 · Morning</span>
+        </div>
+        <div class="signal-lamp-group" id="lamps-0">
+          <div class="lamp red active" id="lamp-0-red"></div>
+          <div class="lamp yellow" id="lamp-0-yellow"></div>
+          <div class="lamp green" id="lamp-0-green"></div>
+        </div>
+      </div>
+
+      <div class="signal-state-row">
+        <div class="state-badge red" id="state-0">RED</div>
+        <div class="timer-display" id="timer-0">--</div>
+      </div>
+
+      <div class="vehicle-count-row">
+        <div class="vc-box">
+          <span class="vc-label">Vehicles Detected</span>
+          <span class="vc-number" id="count-0">0</span>
+        </div>
+        <div class="vc-bar-wrap">
+          <div class="vc-bar" id="vcbar-0"></div>
+        </div>
+      </div>
+
+      <div class="plan-section">
+        <p class="plan-title">Cycle Plan</p>
+        <div class="plan-bar-track" id="planbar-0">
+          <div class="plan-seg green-seg" id="pseg-0-g" style="width:33%">
+            <span class="seg-label" id="plabel-0-g">G: —</span>
+          </div>
+          <div class="plan-seg yellow-seg" id="pseg-0-y" style="width:3%">
+            <span class="seg-label" id="plabel-0-y">Y: 3s</span>
+          </div>
+          <div class="plan-seg red-seg" id="pseg-0-r" style="width:64%">
+            <span class="seg-label" id="plabel-0-r">R: —</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="classes-row">
+        <span class="class-chip">🛺 Auto</span>
+        <span class="class-chip">🏍 Bike</span>
+        <span class="class-chip">🚌 Bus</span>
+        <span class="class-chip">🚗 Car</span>
+        <span class="class-chip">🚛 Truck</span>
+      </div>
+    </div>
+
+    <!-- Lane 1 -->
+    <div class="lane-card" id="lane-1">
+      <div class="lane-header">
+        <div class="lane-id">
+          <span class="lane-badge">L1</span>
+          <span class="lane-name">Lane 1 · Afternoon</span>
+        </div>
+        <div class="signal-lamp-group" id="lamps-1">
+          <div class="lamp red active" id="lamp-1-red"></div>
+          <div class="lamp yellow" id="lamp-1-yellow"></div>
+          <div class="lamp green" id="lamp-1-green"></div>
+        </div>
+      </div>
+
+      <div class="signal-state-row">
+        <div class="state-badge red" id="state-1">RED</div>
+        <div class="timer-display" id="timer-1">--</div>
+      </div>
+
+      <div class="vehicle-count-row">
+        <div class="vc-box">
+          <span class="vc-label">Vehicles Detected</span>
+          <span class="vc-number" id="count-1">0</span>
+        </div>
+        <div class="vc-bar-wrap">
+          <div class="vc-bar" id="vcbar-1"></div>
+        </div>
+      </div>
+
+      <div class="plan-section">
+        <p class="plan-title">Cycle Plan</p>
+        <div class="plan-bar-track" id="planbar-1">
+          <div class="plan-seg green-seg" id="pseg-1-g" style="width:33%">
+            <span class="seg-label" id="plabel-1-g">G: —</span>
+          </div>
+          <div class="plan-seg yellow-seg" id="pseg-1-y" style="width:3%">
+            <span class="seg-label" id="plabel-1-y">Y: 3s</span>
+          </div>
+          <div class="plan-seg red-seg" id="pseg-1-r" style="width:64%">
+            <span class="seg-label" id="plabel-1-r">R: —</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="classes-row">
+        <span class="class-chip">🛺 Auto</span>
+        <span class="class-chip">🏍 Bike</span>
+        <span class="class-chip">🚌 Bus</span>
+        <span class="class-chip">🚗 Car</span>
+        <span class="class-chip">🚛 Truck</span>
+      </div>
+    </div>
+
+    <!-- Lane 2 -->
+    <div class="lane-card" id="lane-2">
+      <div class="lane-header">
+        <div class="lane-id">
+          <span class="lane-badge">L2</span>
+          <span class="lane-name">Lane 2 · Evening</span>
+        </div>
+        <div class="signal-lamp-group" id="lamps-2">
+          <div class="lamp red active" id="lamp-2-red"></div>
+          <div class="lamp yellow" id="lamp-2-yellow"></div>
+          <div class="lamp green" id="lamp-2-green"></div>
+        </div>
+      </div>
+
+      <div class="signal-state-row">
+        <div class="state-badge red" id="state-2">RED</div>
+        <div class="timer-display" id="timer-2">--</div>
+      </div>
+
+      <div class="vehicle-count-row">
+        <div class="vc-box">
+          <span class="vc-label">Vehicles Detected</span>
+          <span class="vc-number" id="count-2">0</span>
+        </div>
+        <div class="vc-bar-wrap">
+          <div class="vc-bar" id="vcbar-2"></div>
+        </div>
+      </div>
+
+      <div class="plan-section">
+        <p class="plan-title">Cycle Plan</p>
+        <div class="plan-bar-track" id="planbar-2">
+          <div class="plan-seg green-seg" id="pseg-2-g" style="width:33%">
+            <span class="seg-label" id="plabel-2-g">G: —</span>
+          </div>
+          <div class="plan-seg yellow-seg" id="pseg-2-y" style="width:3%">
+            <span class="seg-label" id="plabel-2-y">Y: 3s</span>
+          </div>
+          <div class="plan-seg red-seg" id="pseg-2-r" style="width:64%">
+            <span class="seg-label" id="plabel-2-r">R: —</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="classes-row">
+        <span class="class-chip">🛺 Auto</span>
+        <span class="class-chip">🏍 Bike</span>
+        <span class="class-chip">🚌 Bus</span>
+        <span class="class-chip">🚗 Car</span>
+        <span class="class-chip">🚛 Truck</span>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── ACTIVITY LOG ── -->
+  <section class="log-section">
+    <div class="log-header">
+      <span class="log-title">📋 System Log</span>
+      <button class="log-clear-btn" onclick="clearLog()">Clear</button>
+    </div>
+    <div class="log-body" id="logBody"></div>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>
